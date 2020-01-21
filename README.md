@@ -27,3 +27,14 @@ FirebaseModelManager.getInstance().download(remoteModel, conditions)
             }
         });
 ```
+* Next, we need to instantiate the Firebase Interpreter as follows:
+```
+FirebaseModelInterpreter interpreter;
+try {
+    FirebaseModelInterpreterOptions options =
+            new FirebaseModelInterpreterOptions.Builder(localModel).build();
+    interpreter = FirebaseModelInterpreter.getInstance(options);
+} catch (FirebaseMLException e) {
+    // ...
+}
+```
