@@ -13,6 +13,17 @@ TensorFlow Lite is not designed to train a model, the model can be trained on a 
 ### Firebase
 Firebase is a mobile platform by Google, which helps develop mobile apps quickly. [This](https://firebase.google.com/docs/ml-kit/android/use-custom-models) is an excellent tutorial to follow.
 * First upload your model to [Firebase ML console](https://console.firebase.google.com/project/_/ml/apis), you will give a name to the model here, example "Animal-Detector"
-* In the Android App, create a ```FirebaseCustomRemoteModel``` object as:<br/><br/> 
-```FirebaseCustomRemoteModel remoteModel =
-        new FirebaseCustomRemoteModel.Builder("your_model").build(); ```
+* In the Android App, create a ```FirebaseCustomRemoteModel``` object and download it using the folloiwng code:<br/><br/> 
+```
+FirebaseCustomRemoteModel remoteModel = new FirebaseCustomRemoteModel.Builder("your_model").build();
+FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
+        .requireWifi()
+        .build();
+FirebaseModelManager.getInstance().download(remoteModel, conditions)
+        .addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                // Success.
+            }
+        });
+```
