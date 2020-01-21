@@ -8,7 +8,7 @@ I have used the [animals-10](https://www.kaggle.com/alessiocorrado99/animals10) 
 ### TensorFlow Lite Model
 TensorFlow Lite is not designed to train a model, the model can be trained on a higher power device. Then, the pretrained model can be converted to a TensorFlow Lite format (.tflite), which has a smaller footprint than can be easily run on a mobile or other embedded devices for classification, regresion or other such tasks. I converted the .h5 model obtained after the training to a .tflite model using this command: <br/><br/> 
 
-tflite_convert --output_file=animal_model.tflite --keras_model_file=animal_model.h5
+```tflite_convert --output_file=animal_model.tflite --keras_model_file=animal_model.h5```
 
 <br/><br/> Though it is not necessary, just for your reference I have also added the .tflite model in the assets folder. The class labels (.txt) file should be placed in the [assets](https://github.com/mrinalTheCoder/ObjectDetectionApp/tree/master/app/src/main/assets) folder of the android app. 
 
