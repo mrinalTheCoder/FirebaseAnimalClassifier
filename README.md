@@ -38,3 +38,35 @@ try {
     // ...
 }
 ```
+* Finally we are ready to draw inferences using Firebase, we need set the input and output and then run the prediction on the model as:
+```
+# Create the input and output options
+FirebaseModelInputOutputOptions inputOutputOptions =
+        new FirebaseModelInputOutputOptions.Builder()
+                .setInputFormat(0, FirebaseModelDataType.FLOAT32, new int[]{1, 75, 57, 3})
+                .setOutputFormat(0, FirebaseModelDataType.FLOAT32, new int[]{1, 10})
+                .build();
+                
+# Prepare the input data  
+ByteBuffer imgData = ...
+FirebaseModelInputs inputs = new FirebaseModelInputs.Builder().add(imgData).build();
+
+# Run the model
+firebaseInterpreter.run(inputs, inputOutputOptions)
+        .addOnSuccessListener(
+                new OnSuccessListener<FirebaseModelOutputs>() {
+                    @Override
+                    public void onSuccess(FirebaseModelOutputs result) {
+                        // ...
+                    }
+                })
+        .addOnFailureListener(
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Task failed with an exception
+                        // ...
+                    }
+                });                
+
+```
