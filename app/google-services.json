@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "603336544033",
+    "firebase_url": "https://objectdetection-7ddb2.firebaseio.com",
+    "project_id": "objectdetection-7ddb2",
+    "storage_bucket": "objectdetection-7ddb2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:603336544033:android:f6d7251782bd2f30b27860",
+        "android_client_info": {
+          "package_name": "com.objdetector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "603336544033-qrbn65rksvks7lpgdv6l8p7cbpolr17d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-lHgEsIllol7NSQHQeF-hpqTaK_Opiyg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "603336544033-qrbn65rksvks7lpgdv6l8p7cbpolr17d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
