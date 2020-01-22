@@ -72,3 +72,8 @@ firebaseInterpreter.run(inputs, inputOutputOptions)
                 });                
 
 ```
+
+### Animal Classification Results
+
+<br/>Elephant</br>
+<img src="results/elephant.jpg"/>
