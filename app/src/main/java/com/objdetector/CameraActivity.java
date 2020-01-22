@@ -13,6 +13,8 @@ import android.util.Size;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.objdetector.customview.OverlayView;
+
 public abstract class CameraActivity extends Activity
         implements OnImageAvailableListener {
     private static final String LOGGING_TAG = "objdetector";
@@ -65,6 +67,13 @@ public abstract class CameraActivity extends Activity
     protected synchronized void runInBackground(final Runnable runnable) {
         if (handler != null) {
             handler.post(runnable);
+        }
+    }
+
+    public void requestRender() {
+        final OverlayView overlay = (OverlayView) findViewById(R.id.overlay);
+        if (overlay != null) {
+            overlay.postInvalidate();
         }
     }
 

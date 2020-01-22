@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
@@ -18,6 +20,7 @@ import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
 import com.google.firebase.ml.custom.FirebaseModelInputs;
 import com.google.firebase.ml.custom.FirebaseModelInterpreter;
 import com.google.firebase.ml.custom.FirebaseModelInterpreterOptions;
+import com.google.firebase.ml.custom.FirebaseModelOutputs;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,12 +34,13 @@ import java.util.Vector;
 
 public class AnimalDetector {
     private static final String LABEL_FILENAME = "labels.txt";
-    private static final int INPUT_SIZE = 75;
+    private static final int INPUT_SIZE = 224;
     private static final int NUM_BYTES_PER_CHANNEL = 4;
     private static final String LOGGING_TAG = AnimalDetector.class.getName();
 
     private FirebaseModelInterpreter interpreter;
     private FirebaseModelInputOutputOptions dataOptions;
+    private Context ctx;
 
     private ByteBuffer imgData;
     private int[] intValues;
@@ -49,7 +53,9 @@ public class AnimalDetector {
 
     private void init(final Context ctx, final AssetManager assetManager)
             throws IOException, FirebaseMLException {
-        imgData = ByteBuffer.allocateDirect(1 * INPUT_SIZE * INPUT_SIZE * 1 * NUM_BYTES_PER_CHANNEL);
+        this.ctx = ctx;
+
+        imgData = ByteBuffer.allocateDirect(1 * INPUT_SIZE * INPUT_SIZE * 3 * NUM_BYTES_PER_CHANNEL);
         imgData.order(ByteOrder.nativeOrder());
         intValues = new int[INPUT_SIZE * INPUT_SIZE];
 
@@ -89,7 +95,7 @@ public class AnimalDetector {
                     }
                 });
 
-        int[] inputDims = {1, INPUT_SIZE, INPUT_SIZE, 1};
+        int[] inputDims = {1, INPUT_SIZE, INPUT_SIZE, 3};
         int[] outputDims = {1, 10};
 
         int dataType = FirebaseModelDataType.FLOAT32;
@@ -109,7 +115,7 @@ public class AnimalDetector {
         interpreter.close();
     }
 
-    public Task<List<String>> detectObjects(final Bitmap bitmap) throws FirebaseMLException {
+    public Task<String> detectObjects(final Bitmap bitmap) throws FirebaseMLException {
         while(interpreter == null) {
             Log.i(LOGGING_TAG, "Interpreter not yet initialized");
         }
@@ -120,11 +126,14 @@ public class AnimalDetector {
         for (int i = 0; i < INPUT_SIZE; ++i) {
             for (int j = 0; j < INPUT_SIZE; ++j) {
                 int pixelValue = intValues[i * INPUT_SIZE + j];
-                float red = ((pixelValue >> 16) & 0xFF);
-                float blue = ((pixelValue >> 8) & 0xFF);
-                float green = (pixelValue & 0xFF);
-                float normalizedPixelValue = (red + green + blue) / 3.0f;
-                imgData.putFloat(normalizedPixelValue);
+
+                int red = (pixelValue >> 16) & 0xFF;
+                int green = (pixelValue >> 8) & 0xFF;
+                int blue = pixelValue & 0xFF;
+
+                imgData.putFloat(red/255.f);
+                imgData.putFloat(green/255.f);
+                imgData.putFloat(blue/255.f);
             }
         }
 
@@ -143,7 +152,7 @@ public class AnimalDetector {
                         });
     }
 
-    private synchronized List<String> getTopLabel(float[][] labelProbArray) {
+    private synchronized String getTopLabel(float[][] labelProbArray) {
         float max = 0;
         int labelIndex = 0;
         for (int i = 0; i < labels.size(); ++i) {
@@ -152,8 +161,9 @@ public class AnimalDetector {
                 labelIndex = i;
             }
         }
-        List topLabels = new ArrayList();
-        topLabels.add(labelIndex + ":" + labels.get(labelIndex) + ":" + max);
-        return topLabels;
+
+        String topLabel = labels.get(labelIndex) + ":" + max;
+        Log.i(LOGGING_TAG, "********* Detected " + topLabel + " ***********");
+        return topLabel;
     }
 }

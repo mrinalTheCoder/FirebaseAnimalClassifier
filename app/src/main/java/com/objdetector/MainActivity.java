@@ -7,22 +7,27 @@ import android.graphics.Matrix;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.ImageReader.OnImageAvailableListener;
+import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.FirebaseMLException;
+import com.objdetector.customview.OverlayView;
 import com.objdetector.deepmodel.AnimalDetector;
 import com.objdetector.utils.ImageUtils;
 
 import java.util.List;
 
 public class MainActivity extends CameraActivity implements OnImageAvailableListener {
-    private static int MODEL_IMAGE_INPUT_SIZE = 75;
+    private static int MODEL_IMAGE_INPUT_SIZE = 224;
     private static String LOGGING_TAG = MainActivity.class.getName();
 
     private Integer sensorOrientation;
@@ -33,20 +38,12 @@ public class MainActivity extends CameraActivity implements OnImageAvailableList
     private Bitmap rgbBitmapForCameraImage = null;
     private boolean computing = false;
     private Matrix imageTransformMatrix;
+    private OverlayView overlayView;
 
 
     @Override
     public void onPreviewSizeChosen(final Size previewSize, final int rotation) {
-
-        try {
-            animalDetector = AnimalDetector.create(getApplicationContext(), getAssets());
-            Log.i(LOGGING_TAG, "Model Initiated successfully.");
-            Toast.makeText(getApplicationContext(), "AnimalDetector created", Toast.LENGTH_SHORT).show();
-        } catch(Exception e) {
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "AnimalDetector could not be created", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        overlayView = (OverlayView) findViewById(R.id.overlay);
 
         final int screenOrientation = getWindowManager().getDefaultDisplay().getRotation();
         //Sensor orientation: 90, Screen orientation: 0
@@ -93,14 +90,16 @@ public class MainActivity extends CameraActivity implements OnImageAvailableList
         if (animalDetector == null) {
             Log.e(LOGGING_TAG, "AnimalDetector not yet initialized");
         } else {
+
             try {
                 animalDetector.detectObjects(imageBitmapForModel)
                         .addOnSuccessListener(
                                 this,
-                                new OnSuccessListener<List<String>>() {
+                                new OnSuccessListener<String>() {
                                     @Override
-                                    public void onSuccess(List<String> results) {
-                                        Toast.makeText(MainActivity.this, results.get(0), Toast.LENGTH_LONG).show();
+                                    public void onSuccess(String result) {
+                                        overlayView.setResult(result);
+                                        requestRender();
                                     }
                                 })
                         .addOnFailureListener(
@@ -111,10 +110,11 @@ public class MainActivity extends CameraActivity implements OnImageAvailableList
                                         e.printStackTrace();
                                     }
                                 });
-                computing = false;
             } catch (FirebaseMLException ex) {
                 ex.printStackTrace();
                 Log.e(LOGGING_TAG, ex.getMessage());
+            } finally {
+                computing = false;
             }
         }
 
@@ -132,6 +132,20 @@ public class MainActivity extends CameraActivity implements OnImageAvailableList
         super.onDestroy();
         if (animalDetector != null) {
             animalDetector.close();
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            animalDetector = AnimalDetector.create(getApplicationContext(), getAssets());
+            Log.i(LOGGING_TAG, "Model Initiated successfully.");
+            Toast.makeText(getApplicationContext(), "AnimalDetector created", Toast.LENGTH_SHORT).show();
+        } catch(Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "AnimalDetector could not be created", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 }
