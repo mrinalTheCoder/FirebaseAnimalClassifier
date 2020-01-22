@@ -76,4 +76,14 @@ firebaseInterpreter.run(inputs, inputOutputOptions)
 ### Animal Classification Results
 
 <br/>Elephant</br>
-<img src="results/elephant.jpg"/>
+<img src="results/elephant.jpg" width="335" height="730"/>
+
+<br/><br/>Dog</br>
+<img src="results/dog.jpg" width="335" height="730"/>
+
+<br/><br/>Squirrel</br>
+<img src="results/squirrel.jpg" width="335" height="730"/>
+
+<br/><br/>Butterfly</br>
+<img src="results/butterfly.jpg" width="335" height="730"/>
+
